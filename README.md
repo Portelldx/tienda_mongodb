@@ -8,4 +8,4 @@ npm start
 
 localhost:3000
 
-isAdmin:True
+Admin dashboard:  Add isAdmin:True in user mongodb document
