@@ -4,9 +4,8 @@ NodeJS, MongoDB
 
 npm install
 
-Npm start
+npm start
 
-Localhost:3000
+localhost:3000
 
 isAdmin:True
-
