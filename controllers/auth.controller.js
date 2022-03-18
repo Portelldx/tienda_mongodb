@@ -57,37 +57,14 @@ async function signup(req, res, next) {
     return;
   }
 
-  const user = new User(
-    req.body.email,
-    req.body.password,
-    req.body.fullname,
-    req.body.street,
-    req.body.postal,
-    req.body.city
-  );
-
-  try {
-    const existsAlready = await user.existsAlready();
-
-    if (existsAlready) {
-      sessionFlash.flashDataToSession(
-        req,
-        {
-          errorMessage: 'User exists already! Try logging in instead!',
-          ...enteredData,
-        },
-        function () {
-          res.redirect('/signup');
-        }
-      );
-      return;
-    }
-
-    await user.signup();
-  } catch (error) {
-    next(error);
-    return;
-  }
+  await User.create({
+    email: req.body.email,
+    password: req.body.password,
+    fullname: req.body.fullname,
+    street: req.body.street,
+    postal: req.body.postal,
+    city: req.body.city,
+  });
 
   res.redirect('/login');
 }
@@ -106,33 +83,26 @@ function getLogin(req, res) {
 }
 
 async function login(req, res, next) {
-  const user = new User(req.body.email, req.body.password);
-  let existingUser;
-  try {
-    existingUser = await user.getUserWithSameEmail();
-  } catch (error) {
-    next(error);
-    return;
-  }
+  const user = await User.findOne({
+    where: { email: req.body.email },
+  });
+
+  console.log(user);
 
   const sessionErrorData = {
     errorMessage:
       'Invalid credentials - please double-check your email and password!',
-    email: user.email,
-    password: user.password,
+    email: user?.email,
   };
 
-  if (!existingUser) {
+  if (!user) {
     sessionFlash.flashDataToSession(req, sessionErrorData, function () {
       res.redirect('/login');
     });
     return;
   }
 
-  const passwordIsCorrect = await user.hasMatchingPassword(
-    existingUser.password
-  );
-
+  const passwordIsCorrect = await user.authenticate(req.body.password);
   if (!passwordIsCorrect) {
     sessionFlash.flashDataToSession(req, sessionErrorData, function () {
       res.redirect('/login');
@@ -140,7 +110,7 @@ async function login(req, res, next) {
     return;
   }
 
-  authUtil.createUserSession(req, existingUser, function () {
+  authUtil.createUserSession(req, user, function () {
     res.redirect('/');
   });
 }

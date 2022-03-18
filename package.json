@@ -10,14 +10,19 @@
   "author": "Jordi Portell Mas",
   "license": "ISC",
   "dependencies": {
+    "@sequelize/core": "^7.0.0-alpha.10",
     "bcryptjs": "^2.4.3",
     "connect-mongodb-session": "^3.0.0",
+    "connect-session-sequelize": "^7.1.2",
     "csurf": "^1.11.0",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "mongodb": "^4.1.0",
     "multer": "^1.4.3",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.17.0",
+    "sequelize-bcrypt": "^1.1.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

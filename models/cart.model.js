@@ -1,4 +1,5 @@
 const Product = require('./product.model');
+const { Op } = require('@sequelize/core');
 
 class Cart {
   constructor(items = [], totalQuantity = 0, totalPrice = 0) {
@@ -12,7 +13,11 @@ class Cart {
       return item.product.id;
     });
 
-    const products = await Product.findMultiple(productIds);
+    const products = await Product.findAll({
+      where: {
+        id: { [Op.or]: productIds },
+      },
+    });
 
     const deletableCartItemProductIds = [];
 
@@ -52,6 +57,7 @@ class Cart {
 
   addItem(product) {
     const cartItem = {
+      id: product.id,
       product: product,
       quantity: 1,
       totalPrice: product.price,
@@ -78,6 +84,14 @@ class Cart {
   updateItem(productId, newQuantity) {
     for (let i = 0; i < this.items.length; i++) {
       const item = this.items[i];
+      console.log(
+        '----->',
+        typeof item.product.id,
+        typeof productId,
+        newQuantity,
+        item.product.id === productId && newQuantity > 0,
+        item.product.id === productId && newQuantity <= 0
+      );
       if (item.product.id === productId && newQuantity > 0) {
         const cartItem = { ...item };
         const quantityChange = newQuantity - item.quantity;

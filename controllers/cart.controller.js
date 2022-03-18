@@ -7,7 +7,7 @@ async function getCart(req, res) {
 async function addCartItem(req, res, next) {
   let product;
   try {
-    product = await Product.findById(req.body.productId);
+    product = await Product.findByPk(req.body.productId);
   } catch (error) {
     next(error);
     return;
@@ -28,7 +28,7 @@ function updateCartItem(req, res) {
   const cart = res.locals.cart;
 
   const updatedItemData = cart.updateItem(
-    req.body.productId,
+    Number(req.body.productId),
     +req.body.quantity
   );
 

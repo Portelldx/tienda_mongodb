@@ -1,28 +1,20 @@
-const expressSession = require('express-session');
-const mongoDbStore = require('connect-mongodb-session');
+const express = require('express');
+const session = require('express-session');
+const sequelize = require('../data/database-mysql');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+const store = new SequelizeStore({
+  db: sequelize,
+});
 
-function createSessionStore() {
-  const MongoDBStore = mongoDbStore(expressSession);
-
-  const store = new MongoDBStore({
-    uri: 'mongodb://localhost:27017',
-    databaseName: 'online-shop',
-    collection: 'sessions'
-  });
-
-  return store;
-}
-
-function createSessionConfig() {
-  return {
+const useStoreSession = () =>
+  session({
     secret: 'super-secret',
+    store: store,
     resave: false,
     saveUninitialized: false,
-    store: createSessionStore(),
     cookie: {
-      maxAge: 2 * 24 * 60 * 60 * 1000
-    }
-  };
-}
+      maxAge: 2 * 24 * 60 * 60 * 1000,
+    },
+  });
 
-module.exports = createSessionConfig;
+module.exports = useStoreSession;

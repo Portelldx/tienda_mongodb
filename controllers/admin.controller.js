@@ -33,7 +33,7 @@ async function createNewProduct(req, res, next) {
 
 async function getUpdateProduct(req, res, next) {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findByPk(req.params.id);
     res.render('admin/products/update-product', { product: product });
   } catch (error) {
     next(error);
@@ -41,17 +41,21 @@ async function getUpdateProduct(req, res, next) {
 }
 
 async function updateProduct(req, res, next) {
-  const product = new Product({
-    ...req.body,
-    _id: req.params.id,
-  });
-
-  if (req.file) {
-    product.replaceImage(req.file.filename);
-  }
+  // if (req.file) {
+  //   product.replaceImage(req.file.filename);
+  // }
 
   try {
-    await product.save();
+    const product = await Product.update(
+      {
+        ...req.body,
+      },
+      {
+        where: {
+          id: req.params.id,
+        },
+      }
+    );
   } catch (error) {
     next(error);
     return;
@@ -61,10 +65,8 @@ async function updateProduct(req, res, next) {
 }
 
 async function deleteProduct(req, res, next) {
-  let product;
   try {
-    product = await Product.findById(req.params.id);
-    await product.remove();
+    await Product.destroy({ where: { id: req.params.id } });
   } catch (error) {
     return next(error);
   }
@@ -76,7 +78,7 @@ async function getOrders(req, res, next) {
   try {
     const orders = await Order.findAll();
     res.render('admin/orders/admin-orders', {
-      orders: orders
+      orders: orders,
     });
   } catch (error) {
     next(error);
@@ -108,5 +110,5 @@ module.exports = {
   updateProduct: updateProduct,
   deleteProduct: deleteProduct,
   getOrders: getOrders,
-  updateOrder: updateOrder
+  updateOrder: updateOrder,
 };

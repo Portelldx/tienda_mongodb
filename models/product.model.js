@@ -1,107 +1,142 @@
-const mongodb = require('mongodb');
+const { Sequelize, DataTypes, Model } = require('sequelize');
+const sequelize = require('../data/database-mysql');
 
-const db = require('../data/database');
+class Product extends Model {}
 
-class Product {
-  constructor(productData) {
-    this.title = productData.title;
-    this.summary = productData.summary;
-    this.price = +productData.price;
-    this.description = productData.description;
-    this.image = productData.image; // the name of the image file
-    this.updateImageData();
-    if (productData._id) {
-      this.id = productData._id.toString();
-    }
+Product.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    summary: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    price: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    image: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    modelName: 'Products',
   }
+);
 
-  static async findById(productId) {
-    let prodId;
-    try {
-      prodId = new mongodb.ObjectId(productId);
-    } catch (error) {
-      error.code = 404;
-      throw error;
-    }
-    const product = await db
-      .getDb()
-      .collection('products')
-      .findOne({ _id: prodId });
+// constructor(productData) {
+//   this.title = productData.title;
+//   this.summary = productData.summary;
+//   this.price = +productData.price;
+//   this.description = productData.description;
+//   this.image = productData.image; // the name of the image file
+//   this.updateImageData();
+//   if (productData._id) {
+//     this.id = productData._id.toString();
+//   }
+// }
 
-    if (!product) {
-      const error = new Error('Could not find product with provided id.');
-      error.code = 404;
-      throw error;
-    }
+// static async findById(productId) {
+//   let prodId;
+//   try {
+//     prodId = new mongodb.ObjectId(productId);
+//   } catch (error) {
+//     error.code = 404;
+//     throw error;
+//   }
+//   const product = await db
+//     .getDb()
+//     .collection('products')
+//     .findOne({ _id: prodId });
 
-    return new Product(product);
-  }
+//   if (!product) {
+//     const error = new Error('Could not find product with provided id.');
+//     error.code = 404;
+//     throw error;
+//   }
 
-  static async findAll() {
-    const products = await db.getDb().collection('products').find().toArray();
+//   return new Product(product);
+// }
 
-    return products.map(function (productDocument) {
-      return new Product(productDocument);
-    });
-  }
+// static async findAll() {
+//   const products = await db.getDb().collection('products').find().toArray();
 
-  static async findMultiple(ids) {
-    const productIds = ids.map(function(id) {
-      return new mongodb.ObjectId(id);
-    })
-    
-    const products = await db
-      .getDb()
-      .collection('products')
-      .find({ _id: { $in: productIds } })
-      .toArray();
+//   return products.map(function (productDocument) {
+//     return new Product(productDocument);
+//   });
+// }
 
-    return products.map(function (productDocument) {
-      return new Product(productDocument);
-    });
-  }
+// static async findMultiple(ids) {
+//   const productIds = ids.map(function(id) {
+//     return new mongodb.ObjectId(id);
+//   })
 
-  updateImageData() {
-    this.imagePath = `product-data/images/${this.image}`;
-    this.imageUrl = `/products/assets/images/${this.image}`;
-  }
+//   const products = await db
+//     .getDb()
+//     .collection('products')
+//     .find({ _id: { $in: productIds } })
+//     .toArray();
 
-  async save() {
-    const productData = {
-      title: this.title,
-      summary: this.summary,
-      price: this.price,
-      description: this.description,
-      image: this.image,
-    };
+//   return products.map(function (productDocument) {
+//     return new Product(productDocument);
+//   });
+// }
 
-    if (this.id) {
-      const productId = new mongodb.ObjectId(this.id);
+// updateImageData() {
+//   this.imagePath = `product-data/images/${this.image}`;
+//   this.imageUrl = `/products/assets/images/${this.image}`;
+// }
 
-      if (!this.image) {
-        delete productData.image;
-      }
+// async save() {
+//   const productData = {
+//     title: this.title,
+//     summary: this.summary,
+//     price: this.price,
+//     description: this.description,
+//     image: this.image,
+//   };
 
-      await db.getDb().collection('products').updateOne(
-        { _id: productId },
-        {
-          $set: productData,
-        }
-      );
-    } else {
-      await db.getDb().collection('products').insertOne(productData);
-    }
-  }
+//   if (this.id) {
+//     const productId = new mongodb.ObjectId(this.id);
 
-  replaceImage(newImage) {
-    this.image = newImage;
-    this.updateImageData();
-  }
+//     if (!this.image) {
+//       delete productData.image;
+//     }
 
-  remove() {
-    const productId = new mongodb.ObjectId(this.id);
-    return db.getDb().collection('products').deleteOne({ _id: productId });
-  }
-}
+//     await db.getDb().collection('products').updateOne(
+//       { _id: productId },
+//       {
+//         $set: productData,
+//       }
+//     );
+//   } else {
+//     await db.getDb().collection('products').insertOne(productData);
+//   }
+// }
+
+// replaceImage(newImage) {
+//   this.image = newImage;
+//   this.updateImageData();
+// }
+
+// remove() {
+//   const productId = new mongodb.ObjectId(this.id);
+//   return db.getDb().collection('products').deleteOne({ _id: productId });
+// }
+// }
 
 module.exports = Product;

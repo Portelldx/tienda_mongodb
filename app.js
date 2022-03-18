@@ -2,10 +2,11 @@ const path = require('path');
 
 const express = require('express');
 const csrf = require('csurf');
-const expressSession = require('express-session');
 
-const createSessionConfig = require('./config/session');
+const useStoreSession = require('./config/session');
 const db = require('./data/database');
+const sequelize = require('./data/database-mysql');
+
 const addCsrfTokenMiddleware = require('./middlewares/csrf-token');
 const errorHandlerMiddleware = require('./middlewares/error-handler');
 const checkAuthStatusMiddleware = require('./middlewares/check-auth');
@@ -29,10 +30,7 @@ app.use(express.static('public'));
 app.use('/products/assets', express.static('product-data'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-
-const sessionConfig = createSessionConfig();
-
-app.use(expressSession(sessionConfig));
+app.use(useStoreSession());
 app.use(csrf());
 
 app.use(cartMiddleware);
@@ -52,11 +50,14 @@ app.use(notFoundMiddleware);
 
 app.use(errorHandlerMiddleware);
 
-db.connectToDatabase()
-  .then(function () {
+(async () => {
+  try {
+    await db.connectToDatabase();
+    const result = await sequelize.sync();
     app.listen(3000);
-  })
-  .catch(function (error) {
-    console.log('Failed to connect to the database!');
-    console.log(error);
-  });
+  } catch (e) {
+    console.log(e);
+  }
+})();
+
+module.exports = app;
