@@ -1,6 +1,6 @@
 # tienda_mongodb
 
-NodeJS, MongoDB
+NodeJS
 
 npm install
 
