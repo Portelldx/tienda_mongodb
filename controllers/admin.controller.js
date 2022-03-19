@@ -41,14 +41,11 @@ async function getUpdateProduct(req, res, next) {
 }
 
 async function updateProduct(req, res, next) {
-  // if (req.file) {
-  //   product.replaceImage(req.file.filename);
-  // }
-
   try {
-    const product = await Product.update(
+    await Product.update(
       {
         ...req.body,
+        image: req.file?.filename,
       },
       {
         where: {

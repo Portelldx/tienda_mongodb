@@ -1,90 +1,37 @@
-const mongodb = require('mongodb');
+const { Model, DataTypes } = require('sequelize');
+const sequelize = require('../data/database-mysql');
+const Order_Product = require('./orderProduct.model');
+const Product = require('./product.model');
+const User = require('./user.model');
 
-const db = require('../data/database');
+class Order extends Model {}
 
-class Order {
-  // Status => pending, fulfilled, cancelled
-  constructor(cart, userData, status = 'pending', date, orderId) {
-    this.productData = cart;
-    this.userData = userData;
-    this.status = status;
-    this.date = new Date(date);
-    if (this.date) {
-      this.formattedDate = this.date.toLocaleDateString('en-US', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
-    }
-    this.id = orderId;
+Order.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    status: {
+      type: DataTypes.ENUM,
+      allowNull: false,
+      values: ['pending', 'fulfilled', 'cancelled'],
+    },
+    date: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+  },
+  {
+    sequelize,
+    modelName: 'Order',
   }
+);
 
-  static transformOrderDocument(orderDoc) {
-    return new Order(
-      orderDoc.productData,
-      orderDoc.userData,
-      orderDoc.status,
-      orderDoc.date,
-      orderDoc._id
-    );
-  }
-
-  static transformOrderDocuments(orderDocs) {
-    return orderDocs.map(this.transformOrderDocument);
-  }
-
-  static async findAll() {
-    const orders = await db
-      .getDb()
-      .collection('orders')
-      .find()
-      .sort({ _id: -1 })
-      .toArray();
-
-    return this.transformOrderDocuments(orders);
-  }
-
-  static async findAllForUser(userId) {
-    const uid = new mongodb.ObjectId(userId);
-
-    const orders = await db
-      .getDb()
-      .collection('orders')
-      .find({ 'userData._id': uid })
-      .sort({ _id: -1 })
-      .toArray();
-
-    return this.transformOrderDocuments(orders);
-  }
-
-  static async findById(orderId) {
-    const order = await db
-      .getDb()
-      .collection('orders')
-      .findOne({ _id: new mongodb.ObjectId(orderId) });
-
-    return this.transformOrderDocument(order);
-  }
-
-  save() {
-    if (this.id) {
-      const orderId = new mongodb.ObjectId(this.id);
-      return db
-        .getDb()
-        .collection('orders')
-        .updateOne({ _id: orderId }, { $set: { status: this.status } });
-    } else {
-      const orderDocument = {
-        userData: this.userData,
-        productData: this.productData,
-        date: new Date(),
-        status: this.status,
-      };
-
-      return db.getDb().collection('orders').insertOne(orderDocument);
-    }
-  }
-}
+Order.belongsTo(User, { as: 'user' });
+User.hasMany(Order);
 
 module.exports = Order;

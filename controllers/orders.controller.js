@@ -1,11 +1,15 @@
 const Order = require('../models/order.model');
 const User = require('../models/user.model');
 
-async function getOrders(req, res) {
+async function getOrders(req, res, next) {
   try {
-    const orders = await Order.findAllForUser(res.locals.uid);
+    const orders = await Order.findAll({
+      include: { model: User, as: 'user' },
+      where: { UserId: res.locals.uid },
+    });
+    console.log('----->', orders[0].user);
     res.render('customer/orders/all-orders', {
-      orders: orders
+      orders: orders,
     });
   } catch (error) {
     next(error);
@@ -14,22 +18,20 @@ async function getOrders(req, res) {
 
 async function addOrder(req, res, next) {
   const cart = res.locals.cart;
-
-  let userDocument;
+  console.log(cart.items[0].product);
+  let user;
   try {
-    userDocument = await User.findById(res.locals.uid);
+    user = await User.findByPk(res.locals.uid);
   } catch (error) {
     return next(error);
   }
 
-  const order = new Order(cart, userDocument);
+  const order = await Order.create({
+    status: 'pending',
+  });
 
-  try {
-    await order.save();
-  } catch (error) {
-    next(error);
-    return;
-  }
+  order.setUser(user);
+  cart.items.forEach(({ product }) => product.setOrders([order]));
 
   req.session.cart = null;
 

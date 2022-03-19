@@ -1,10 +1,6 @@
-const { Sequelize, DataTypes, Model } = require('sequelize');
-const Op = Sequelize.Op;
+const { DataTypes, Model } = require('sequelize');
 const useBcrypt = require('sequelize-bcrypt'); // Encriptador
 const sequelize = require('../data/database-mysql');
-// const mongodb = require('mongodb');
-
-// const db = require('../data/database');
 
 class User extends Model {}
 
