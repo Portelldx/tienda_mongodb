@@ -1,6 +1,6 @@
 # tienda_mongodb
 
-NodeJS
+NodeJS, MySQL
 
 npm install
 
