@@ -1,6 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../data/database-mysql');
-const Order_Product = require('./orderProduct.model');
 const Product = require('./product.model');
 const User = require('./user.model');
 
@@ -19,6 +18,14 @@ Order.init(
       allowNull: false,
       values: ['pending', 'fulfilled', 'cancelled'],
     },
+    totalPrice: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    totalQuantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     date: {
       type: DataTypes.DATE,
       allowNull: false,
@@ -32,6 +39,5 @@ Order.init(
 );
 
 Order.belongsTo(User, { as: 'user' });
-User.hasMany(Order);
 
 module.exports = Order;

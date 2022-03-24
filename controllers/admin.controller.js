@@ -1,5 +1,6 @@
 const Product = require('../models/product.model');
 const Order = require('../models/order.model');
+const User = require('../models/user.model');
 
 async function getProducts(req, res, next) {
   try {
@@ -73,7 +74,13 @@ async function deleteProduct(req, res, next) {
 
 async function getOrders(req, res, next) {
   try {
-    const orders = await Order.findAll();
+    const orders = await Order.findAll({
+      include: [
+        { model: User, as: 'user' },
+        { model: Product, as: 'items' },
+      ],
+    });
+
     res.render('admin/orders/admin-orders', {
       orders: orders,
     });
@@ -87,7 +94,7 @@ async function updateOrder(req, res, next) {
   const newStatus = req.body.newStatus;
 
   try {
-    const order = await Order.findById(orderId);
+    const order = await Order.findByPk(orderId);
 
     order.status = newStatus;
 

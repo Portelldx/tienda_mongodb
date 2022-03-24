@@ -1,7 +1,6 @@
 const { DataTypes, Model } = require('sequelize');
 const sequelize = require('../data/database-mysql');
 const Order = require('./order.model');
-const Order_Product = require('./orderProduct.model');
 class Product extends Model {}
 
 Product.init(
@@ -48,7 +47,5 @@ Product.init(
     modelName: 'Products',
   }
 );
-
-Product.belongsToMany(Order, { through: Order_Product });
 
 module.exports = Product;

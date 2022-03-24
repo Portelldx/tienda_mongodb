@@ -56,17 +56,30 @@ async function signup(req, res, next) {
     );
     return;
   }
+  try {
+    await User.create({
+      email: req.body.email,
+      password: req.body.password,
+      fullname: req.body.fullname,
+      street: req.body.street,
+      postal: req.body.postal,
+      city: req.body.city,
+    });
 
-  await User.create({
-    email: req.body.email,
-    password: req.body.password,
-    fullname: req.body.fullname,
-    street: req.body.street,
-    postal: req.body.postal,
-    city: req.body.city,
-  });
-
-  res.redirect('/login');
+    res.redirect('/login');
+  } catch (e) {
+    console.log(e);
+    sessionFlash.flashDataToSession(
+      req,
+      {
+        errorMessage: `Unexpected error happened contact the admin`,
+        ...enteredData,
+      },
+      function () {
+        res.redirect('/signup');
+      }
+    );
+  }
 }
 
 function getLogin(req, res) {

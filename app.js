@@ -4,7 +4,6 @@ const express = require('express');
 const csrf = require('csurf');
 
 const useStoreSession = require('./config/session');
-const db = require('./data/database');
 const sequelize = require('./data/database-mysql');
 
 const addCsrfTokenMiddleware = require('./middlewares/csrf-token');
@@ -52,7 +51,6 @@ app.use(errorHandlerMiddleware);
 
 (async () => {
   try {
-    await db.connectToDatabase();
     const result = await sequelize.sync();
     app.listen(3000);
   } catch (e) {

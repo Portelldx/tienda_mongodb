@@ -1,12 +1,62 @@
-const { DataTypes, Model } = require('sequelize');
+const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../data/database-mysql');
+const Product = require('./product.model');
+const Order = require('./order.model');
 
-const Order_Product = sequelize.define(
-  'Order_Product',
+// class OrderProduct extends Model {}
+
+// OrderProduct.init(
+//   {
+//     id: {
+//       type: DataTypes.INTEGER,
+//       allowNull: false,
+//       autoIncrement: true,
+//       primaryKey: true,
+//     },
+//     quantity: {
+//       type: DataTypes.INTEGER,
+//       allowNull: false,
+//     },
+//     totalPrice: {
+//       type: DataTypes.FLOAT,
+//       allowNull: false,
+//     },
+//     orderId: {
+//       type: 'foreign_key',
+//       allowNull: false,
+//     },
+//     productId: {
+//       type: DataTypes.INTEGER,
+//       allowNull: false,
+//     },
+//   },
+//   {
+//     sequelize,
+//     modelName: 'OrderProduct',
+//   }
+// );
+
+const OrderProduct = sequelize.define(
+  'OrderProduct',
   {
-    quantity: DataTypes.INTEGER,
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    quantity: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    totalPrice: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
   },
   { timestamps: false }
 );
 
-module.exports = Order_Product;
+Order.belongsToMany(Product, { through: OrderProduct, as: 'items' });
+Product.belongsToMany(Order, { through: OrderProduct, as: 'orders' });
+module.exports = OrderProduct;

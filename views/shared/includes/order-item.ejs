@@ -1,19 +1,19 @@
 <article class="order-item">
   <header class="order-summary">
-    <h2><span class="order-item-price">$<%= order.productData.totalPrice.toFixed(2) %></span> - <%= order.formattedDate %></h2>
+    <h2><span class="order-item-price">Total Price: <%= order.totalPrice.toFixed(2) %></span></h2>
     <p><span class="badge"><%= order.status.toUpperCase() %></span></p>
   </header>
 
   <section class="order-details">
     <% if (locals.isAdmin) { %>
       <address>
-        <p><a href="mailto:<%= order.user.email %>"><%= order.user.name %></a></p>
-        <p><%= order.user.street %> (<%= order.user.postalCode %> <%= order.user.city %>)</p>
+        <p><a href="mailto:<%= order.user.email %>">Fullname: <%= order.user.fullname %></a></p>
+        <p>Address: <%= order.user.street %> (<%= order.user.postalCode %> <%= order.user.city %>)</p>
       </address>
     <% } %>
     <ul>
-      <% for (const item of order.productData.items) { %>
-        <li><%= item.product.title %> - $<%= item.totalPrice.toFixed(2) %> ($<%= item.product.price.toFixed(2) %> x <%= item.quantity %>)</li>
+      <% for (const item of order.items) { %>
+        <li><%= item.title %> - $<%= item.OrderProduct.totalPrice.toFixed(2) %> ($<%= item.OrderProduct.totalPrice.toFixed(2) / item.OrderProduct.quantity %> x <%= item.OrderProduct.quantity %>)</li>
       <% } %>
     </ul>
   </section>
