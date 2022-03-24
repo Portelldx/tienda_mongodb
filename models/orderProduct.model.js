@@ -3,39 +3,6 @@ const sequelize = require('../data/database-mysql');
 const Product = require('./product.model');
 const Order = require('./order.model');
 
-// class OrderProduct extends Model {}
-
-// OrderProduct.init(
-//   {
-//     id: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//       autoIncrement: true,
-//       primaryKey: true,
-//     },
-//     quantity: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//     },
-//     totalPrice: {
-//       type: DataTypes.FLOAT,
-//       allowNull: false,
-//     },
-//     orderId: {
-//       type: 'foreign_key',
-//       allowNull: false,
-//     },
-//     productId: {
-//       type: DataTypes.INTEGER,
-//       allowNull: false,
-//     },
-//   },
-//   {
-//     sequelize,
-//     modelName: 'OrderProduct',
-//   }
-// );
-
 const OrderProduct = sequelize.define(
   'OrderProduct',
   {
